@@ -16,7 +16,6 @@ import requests
 # ──────────────────────────────────────────────────────────────────────
 # CONFIGURATION
 # ──────────────────────────────────────────────────────────────────────
-# Multi-movie tracking config parsed from BMS_TRACKS env var (or fallback default)
 DEFAULT_TRACKS = [
     {
         "movie_name": "Jailer 2",
@@ -24,7 +23,7 @@ DEFAULT_TRACKS = [
         "dates": "20261015,20261016,20261017,20261018,20261019",
         "theatre": "ALLU,AMB,PRASADS",
         "time_period": "",
-        "languages": ["Malayalam"],
+        "languages": ["Telugu"],
     }
 ]
 
@@ -236,7 +235,6 @@ def filter_shows(shows, track, movie_language):
     dates_set = set(d.strip() for d in track.get("dates", "").split(",") if d.strip())
     langs = [l.strip().lower() for l in track.get("languages", []) if l.strip()]
 
-    # Check language filter against movie language
     if langs:
         if not any(l in movie_language.lower() for l in langs):
             return []
@@ -259,8 +257,11 @@ def filter_shows(shows, track, movie_language):
 # ──────────────────────────────────────────────────────────────────────
 # STATE MANAGEMENT
 # ──────────────────────────────────────────────────────────────────────
-def get_state_filename(event_code):
-    return f"bms_state_{event_code}.json"
+def get_state_filename(movie_name, event_code):
+    # Sanitize movie name: lowercase, replace spaces/special chars with underscores
+    sanitized_name = re.sub(r'[^a-zA-Z0-9]', '_', movie_name.lower())
+    sanitized_name = re.sub(r'_+', '_', sanitized_name).strip('_')
+    return f"bms_state_{sanitized_name}_{event_code}.json"
 
 def load_state(filename):
     try:
@@ -359,16 +360,16 @@ def send_email(subject, changes, movie_name):
 # ──────────────────────────────────────────────────────────────────────
 def main():
     tracks = load_tracks()
-    print(tracks)
-    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S' )}] Running checks for {len(tracks)} movie(s)...")
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Running checks for {len(tracks)} movie(s)...")
 
     for track in tracks:
         url = track.get("url", "")
         parsed = parse_bms_url(url)
         event_code, region_slug = parsed["event_code"], parsed["region_slug"]
+        movie_config_name = track.get("movie_name", "Movie")
 
         if not event_code or not region_slug:
-            print(f"  ❌ Invalid URL for track: {track.get('movie_name')}")
+            print(f"  ❌ Invalid URL for track: {movie_config_name}")
             continue
 
         region_code, region_slug_r, lat, lon, geohash = resolve_region(region_slug)
@@ -376,14 +377,17 @@ def main():
         date_list = [d.strip() for d in raw_dates.split(",") if d.strip()] if raw_dates else [parsed.get("date_code", "")]
 
         all_shows, all_dates = [], []
-        movie_info = {"name": track.get("movie_name", "Movie"), "language": ""}
+        movie_info = {"name": movie_config_name, "language": ""}
 
         for dc in date_list:
             data = fetch_bms(event_code, dc, region_code, region_slug_r, lat, lon, geohash)
             if not data:
                 continue
             if not movie_info["language"]:
-                movie_info = parse_movie_info(data)
+                parsed_info = parse_movie_info(data)
+                if parsed_info["name"] != "Unknown Movie":
+                    movie_info["name"] = parsed_info["name"]
+                movie_info["language"] = parsed_info["language"]
             all_dates.extend(parse_dates(data))
             all_shows.extend(parse_shows(data))
 
@@ -394,7 +398,7 @@ def main():
         filtered = filter_shows(all_shows, track, movie_info["language"])
         print(f"  🎬 {movie_info['name']} ({movie_info['language']}) — {len(filtered)} show(s) matched filters.")
 
-        state_file = get_state_filename(event_code)
+        state_file = get_state_filename(movie_config_name, event_code)
         new_state = build_state(filtered, all_dates)
         old_state = load_state(state_file)
 
