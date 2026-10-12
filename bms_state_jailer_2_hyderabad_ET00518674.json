@@ -240,22 +240,6 @@
       "price": "295.00",
       "status": "2"
     },
-    "ALUC|5941|20261015|GOLD": {
-      "venue": "ALLU Cinemas: Kokapet",
-      "time": "10:00 PM",
-      "date": "20261015",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "1"
-    },
-    "AMBH|120192|20261016|GOLD": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "03:55 PM",
-      "date": "20261016",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "3"
-    },
     "AMBH|120192|20261016|LOUNGERS": {
       "venue": "AMB Cinemas: Gachibowli",
       "time": "03:55 PM",
