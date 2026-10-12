@@ -1,6 +1,6 @@
 """
 BMS Ticket Checker — Multi-movie tracking via JSON config.
-Filters out all SOLD OUT shows/categories completely.
+Emails initial discoveries & changes, followed by a clean summary table of active shows.
 """
 
 import os
@@ -219,14 +219,12 @@ def parse_shows(data):
                     )
                     for cat in sa.get("categories", []):
                         ca = str(cat.get("availStatus", ""))
-                        # Remove SOLD OUT ("0") categories directly during parsing
-                        if ca != "0":
+                        if ca != "0":  # Ignore sold-out categories
                             show.categories.append(CatInfo(
                                 name=cat.get("priceDesc", ""),
                                 price=cat.get("curPrice", "0"),
                                 status=ca,
                             ))
-                    # Only append show if it has at least one non-sold-out category
                     if show.categories:
                         shows.append(show)
     return shows
@@ -303,7 +301,6 @@ def detect_changes(old_state, new_state):
     old_shows = old_state.get("shows", {})
     new_shows = new_state.get("shows", {})
 
-    # Any show category in new_shows that wasn't in old_shows is a new/reopened availability
     for key in set(new_shows) - set(old_shows):
         s = new_shows[key]
         _, ico = AVAIL_STATUS_MAP.get(s["status"], ("AVAILABLE", "🟢"))
@@ -312,9 +309,64 @@ def detect_changes(old_state, new_state):
     return changes
 
 # ──────────────────────────────────────────────────────────────────────
+# HTML TABLE GENERATOR
+# ──────────────────────────────────────────────────────────────────────
+def generate_summary_table(shows):
+    # Group shows by (Theatre, Date, Format)
+    grouped = {}
+    for s in shows:
+        attr = (s.screen_attr or "Standard").strip()
+        # Ignore Gold / Lounge formats
+        if re.search(r'gold|lounge|lounger', attr, re.IGNORECASE):
+            continue
+
+        key = (s.venue_name, s.date_code, attr)
+        if key not in grouped:
+            grouped[key] = set()
+        grouped[key].add(s.time)
+
+    if not grouped:
+        return ""
+
+    table_rows = []
+    for (venue, date_code, fmt), times in sorted(grouped.items()):
+        formatted_date = date_code
+        if len(date_code) == 8:
+            try:
+                dt = datetime.strptime(date_code, "%Y%m%d")
+                formatted_date = dt.strftime("%d %b %Y")
+            except ValueError:
+                pass
+
+        time_str = ", ".join(sorted(times))
+        table_rows.append(f"""
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;"><b>{escape(venue)}</b></td>
+            <td style="padding: 8px; border: 1px solid #ddd; white-space: nowrap;">{escape(formatted_date)}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{escape(time_str)}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{escape(fmt)}</td>
+        </tr>""")
+
+    return f"""
+    <h3 style="font-size: 15px; margin-top: 24px; margin-bottom: 8px;">Active Shows Summary</h3>
+    <table style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left;">
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th style="padding: 8px; border: 1px solid #ddd;">Theatre</th>
+                <th style="padding: 8px; border: 1px solid #ddd;">Date</th>
+                <th style="padding: 8px; border: 1px solid #ddd;">Timings</th>
+                <th style="padding: 8px; border: 1px solid #ddd;">Format</th>
+            </tr>
+        </thead>
+        <tbody>
+            {"".join(table_rows)}
+        </tbody>
+    </table>"""
+
+# ──────────────────────────────────────────────────────────────────────
 # EMAIL NOTIFICATION
 # ──────────────────────────────────────────────────────────────────────
-def send_email(subject, changes, movie_name):
+def send_email(subject, changes, movie_name, shows):
     api_key = RESEND_API_KEY.strip()
     to = RESEND_TO_EMAIL.strip()
     frm = RESEND_FROM_EMAIL.strip() or "onboarding@resend.dev"
@@ -325,19 +377,24 @@ def send_email(subject, changes, movie_name):
 
     now_str = datetime.now().strftime("%d %b %Y, %I:%M %p")
     rows = "".join(f'<li style="padding:4px 0;font-size:14px;">{escape(c)}</li>' for c in changes)
+    summary_table_html = generate_summary_table(shows)
     
     html = f"""<!doctype html>
 <html>
-<body style="font-family:Arial,sans-serif;font-size:14px;color:#333;">
+<body style="font-family:Arial,sans-serif;font-size:14px;color:#333;line-height:1.4;">
     <h2 style="margin:0 0 4px 0;font-size:18px;">BMS Alert: {escape(movie_name)}</h2>
     <p style="margin:0 0 16px 0;font-size:12px;color:#666;">{escape(now_str)}</p>
-    <h3 style="font-size:15px;margin-bottom:8px;">Tickets Available</h3>
+    
+    <h3 style="font-size:15px;margin-bottom:8px;">Updates / Discoveries</h3>
     <ul style="padding-left:20px;line-height:1.5;">{rows}</ul>
-    <p style="font-size:12px;color:#999;margin-top:20px;">Automated alert from BMS Ticket Notifier.</p>
+
+    {summary_table_html}
+
+    <p style="font-size:12px;color:#999;margin-top:24px;">Automated alert from BMS Ticket Notifier.</p>
 </body>
 </html>"""
 
-    plain = f"{subject}\n\n" + "\n".join(f"- {c}" for c in changes)
+    plain = f"{subject}\n\nUpdates:\n" + "\n".join(f"- {c}" for c in changes)
 
     try:
         resp = requests.post(
@@ -400,7 +457,7 @@ def main():
         new_state = build_state(filtered, all_dates)
         old_state = load_state(state_file)
 
-        # First run: email initial active discoveries
+        # First run: treat all matching active shows as initial discoveries
         if not old_state:
             changes = []
             for s in filtered:
@@ -414,7 +471,7 @@ def main():
 
         if changes:
             print(f"  ⚡ {len(changes)} update(s) detected! Sending email...")
-            send_email(f"BMS Alert: {movie_info['name']} - {len(changes)} update(s)", changes, movie_info["name"])
+            send_email(f"BMS Alert: {movie_info['name']} - {len(changes)} update(s)", changes, movie_info["name"], filtered)
         else:
             print("  ✅ No new available showtimes since last check.")
 
