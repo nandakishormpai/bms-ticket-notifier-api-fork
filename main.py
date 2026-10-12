@@ -24,7 +24,7 @@ DEFAULT_TRACKS = [
         "dates": "20261015,20261016,20261017,20261018,20261019",
         "theatre": "ALLU,AMB,PRASADS",
         "time_period": "",
-        "languages": ["Telugu"],
+        "languages": ["Malayalam"],
     }
 ]
 
@@ -359,6 +359,7 @@ def send_email(subject, changes, movie_name):
 # ──────────────────────────────────────────────────────────────────────
 def main():
     tracks = load_tracks()
+    print(tracks)
     print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S' )}] Running checks for {len(tracks)} movie(s)...")
 
     for track in tracks:
