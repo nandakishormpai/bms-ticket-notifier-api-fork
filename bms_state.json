@@ -22,7 +22,7 @@
       "date": "20261015",
       "cat": "LOUNGERS",
       "price": "295.00",
-      "status": "3"
+      "status": "2"
     },
     "AMBH|120150|20261015|PLATINUM": {
       "venue": "AMB Cinemas: Gachibowli",
@@ -310,7 +310,7 @@
       "date": "20261015",
       "cat": "GOLD",
       "price": "295.00",
-      "status": "3"
+      "status": "2"
     },
     "ALUC|5974|20261015|PLATINUM": {
       "venue": "ALLU Cinemas: Kokapet",
@@ -326,7 +326,7 @@
       "date": "20261015",
       "cat": "GOLD",
       "price": "295.00",
-      "status": "3"
+      "status": "2"
     },
     "ALUC|5941|20261015|PLATINUM": {
       "venue": "ALLU Cinemas: Kokapet",
@@ -342,7 +342,7 @@
       "date": "20261015",
       "cat": "GOLD",
       "price": "295.00",
-      "status": "3"
+      "status": "2"
     }
   },
   "dates": {
