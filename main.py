@@ -1,6 +1,6 @@
 """
 BMS Ticket Checker — Multi-movie tracking via JSON config.
-Runs once, checks all configured watches, emails only on changes.
+Filters out all SOLD OUT shows/categories completely.
 """
 
 import os
@@ -45,7 +45,6 @@ RESEND_FROM_EMAIL = os.getenv("RESEND_FROM_EMAIL", "aviiciii@resend.dev")
 # CONSTANTS & MAPS
 # ──────────────────────────────────────────────────────────────────────
 AVAIL_STATUS_MAP = {
-    "0": ("SOLD OUT",    "🔴"),
     "1": ("ALMOST FULL", "🟡"),
     "2": ("FILLING FAST","🟠"),
     "3": ("AVAILABLE",   "🟢"),
@@ -220,12 +219,16 @@ def parse_shows(data):
                     )
                     for cat in sa.get("categories", []):
                         ca = str(cat.get("availStatus", ""))
-                        show.categories.append(CatInfo(
-                            name=cat.get("priceDesc", ""),
-                            price=cat.get("curPrice", "0"),
-                            status=ca,
-                        ))
-                    shows.append(show)
+                        # Remove SOLD OUT ("0") categories directly during parsing
+                        if ca != "0":
+                            show.categories.append(CatInfo(
+                                name=cat.get("priceDesc", ""),
+                                price=cat.get("curPrice", "0"),
+                                status=ca,
+                            ))
+                    # Only append show if it has at least one non-sold-out category
+                    if show.categories:
+                        shows.append(show)
     return shows
 
 def filter_shows(shows, track, movie_language):
@@ -258,7 +261,6 @@ def filter_shows(shows, track, movie_language):
 # STATE MANAGEMENT
 # ──────────────────────────────────────────────────────────────────────
 def get_state_filename(movie_name, event_code):
-    # Sanitize movie name: lowercase, replace spaces/special chars with underscores
     sanitized_name = re.sub(r'[^a-zA-Z0-9]', '_', movie_name.lower())
     sanitized_name = re.sub(r'_+', '_', sanitized_name).strip('_')
     return f"bms_state_{sanitized_name}_{event_code}.json"
@@ -301,15 +303,11 @@ def detect_changes(old_state, new_state):
     old_shows = old_state.get("shows", {})
     new_shows = new_state.get("shows", {})
 
+    # Any show category in new_shows that wasn't in old_shows is a new/reopened availability
     for key in set(new_shows) - set(old_shows):
         s = new_shows[key]
-        changes.append(f"🆕 NEW SHOW: {s['venue']} {s['time']} [{s['date']}] — {s['cat']} ₹{s['price']}")
-
-    for key, new_s in new_shows.items():
-        old_s = old_shows.get(key)
-        if old_s and old_s["status"] == "0" and new_s["status"] != "0":
-            _, ico = AVAIL_STATUS_MAP.get(new_s["status"], ("UNKNOWN", "⚪"))
-            changes.append(f"{ico} TICKETS BACK: {new_s['venue']} {new_s['time']} [{new_s['date']}] — {new_s['cat']}")
+        _, ico = AVAIL_STATUS_MAP.get(s["status"], ("AVAILABLE", "🟢"))
+        changes.append(f"{ico} TICKETS AVAILABLE: {s['venue']} {s['time']} [{s['date']}] — {s['cat']} ₹{s['price']}")
 
     return changes
 
@@ -333,7 +331,7 @@ def send_email(subject, changes, movie_name):
 <body style="font-family:Arial,sans-serif;font-size:14px;color:#333;">
     <h2 style="margin:0 0 4px 0;font-size:18px;">BMS Alert: {escape(movie_name)}</h2>
     <p style="margin:0 0 16px 0;font-size:12px;color:#666;">{escape(now_str)}</p>
-    <h3 style="font-size:15px;margin-bottom:8px;">Changes Detected</h3>
+    <h3 style="font-size:15px;margin-bottom:8px;">Tickets Available</h3>
     <ul style="padding-left:20px;line-height:1.5;">{rows}</ul>
     <p style="font-size:12px;color:#999;margin-top:20px;">Automated alert from BMS Ticket Notifier.</p>
 </body>
@@ -392,24 +390,33 @@ def main():
             all_shows.extend(parse_shows(data))
 
         if not all_shows:
-            print(f"  ⚠️ No showtimes found for {movie_info['name']}")
+            print(f"  ⚠️ No active showtimes found for {movie_info['name']}")
             continue
 
         filtered = filter_shows(all_shows, track, movie_info["language"])
-        print(f"  🎬 {movie_info['name']} ({movie_info['language']}) — {len(filtered)} show(s) matched filters.")
+        print(f"  🎬 {movie_info['name']} ({movie_info['language']}) — {len(filtered)} available show(s) matched filters.")
 
         state_file = get_state_filename(movie_config_name, event_code)
         new_state = build_state(filtered, all_dates)
         old_state = load_state(state_file)
 
-        changes = detect_changes(old_state, new_state) if old_state else []
+        # First run: email initial active discoveries
+        if not old_state:
+            changes = []
+            for s in filtered:
+                for c in s.categories:
+                    _, ico = AVAIL_STATUS_MAP.get(c.status, ("AVAILABLE", "🟢"))
+                    changes.append(f"{ico} INITIAL DISCOVERY: {s.venue_name} {s.time} [{s.date_code}] — {c.name} ₹{c.price}")
+        else:
+            changes = detect_changes(old_state, new_state)
+
         save_state(state_file, new_state)
 
         if changes:
-            print(f"  ⚡ {len(changes)} change(s) detected! Sending email...")
+            print(f"  ⚡ {len(changes)} update(s) detected! Sending email...")
             send_email(f"BMS Alert: {movie_info['name']} - {len(changes)} update(s)", changes, movie_info["name"])
         else:
-            print("  ✅ No changes since last check.")
+            print("  ✅ No new available showtimes since last check.")
 
     print("\nAll checks complete.")
 
