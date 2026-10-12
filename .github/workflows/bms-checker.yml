@@ -15,12 +15,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: '3.14'
+          python-version: '3.12'
 
       - name: Install dependencies
         run: uv sync --frozen
@@ -30,15 +30,12 @@ jobs:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           RESEND_TO_EMAIL: ${{ secrets.RESEND_TO_EMAIL }}
           RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
-          BMS_URL: ${{ vars.BMS_URL }}
-          BMS_DATES: ${{ vars.BMS_DATES }}
-          BMS_THEATRE: ${{ vars.BMS_THEATRE }}
-          BMS_TIME: ${{ vars.BMS_TIME }}
+          BMS_TRACKS: ${{ secrets.BMS_TRACKS }}
         run: uv run main.py
 
       - name: Commit updated state
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add bms_state.json
-          git diff --cached --quiet || (git commit -m "chore: update bms_state.json [skip ci]" && git push)
+          git add bms_state*.json
+          git diff --cached --quiet || (git commit -m "chore: update state files [skip ci]" && git push)
