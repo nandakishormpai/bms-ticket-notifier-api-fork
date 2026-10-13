@@ -8,7 +8,7 @@ import re
 import sys
 import json
 from html import escape
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass, field
 from urllib.parse import urlparse
 import requests
@@ -375,7 +375,9 @@ def send_email(subject, changes, movie_name, shows):
         print("  ⚠️ Skipping email — RESEND_API_KEY or RESEND_TO_EMAIL not set.")
         return
 
-    now_str = datetime.now().strftime("%d %b %Y, %I:%M %p")
+    # Define IST timezone (+5:30)
+    IST = timezone(timedelta(hours=5, minutes=30))
+    now_str = datetime.now(IST).strftime("%d %b %Y, %I:%M %p")
     rows = "".join(f'<li style="padding:4px 0;font-size:14px;">{escape(c)}</li>' for c in changes)
     summary_table_html = generate_summary_table(shows)
     
