@@ -1,5 +1,13 @@
 {
   "shows": {
+    "AMBH|120384|20261015|GOLD": {
+      "venue": "AMB Cinemas: Gachibowli",
+      "time": "12:40 PM",
+      "date": "20261015",
+      "cat": "GOLD",
+      "price": "295.00",
+      "status": "2"
+    },
     "AMBH|120384|20261015|LOUNGERS": {
       "venue": "AMB Cinemas: Gachibowli",
       "time": "12:40 PM",
@@ -14,7 +22,7 @@
       "date": "20261015",
       "cat": "GOLD",
       "price": "295.00",
-      "status": "2"
+      "status": "1"
     },
     "AMBH|120361|20261015|LOUNGERS": {
       "venue": "AMB Cinemas: Gachibowli",
@@ -110,7 +118,7 @@
       "date": "20261015",
       "cat": "EXECUTIVE",
       "price": "295.00",
-      "status": "2"
+      "status": "1"
     },
     "PRHN|257418|20261015|EXECUTIVE": {
       "venue": "Prasads Multiplex: Hyderabad",
