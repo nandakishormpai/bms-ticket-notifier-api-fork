@@ -1,21 +1,5 @@
 {
   "shows": {
-    "AMBH|120384|20261015|GOLD": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "12:40 PM",
-      "date": "20261015",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "2"
-    },
-    "AMBH|120384|20261015|LOUNGERS": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "12:40 PM",
-      "date": "20261015",
-      "cat": "LOUNGERS",
-      "price": "295.00",
-      "status": "3"
-    },
     "AMBH|120361|20261015|GOLD": {
       "venue": "AMB Cinemas: Gachibowli",
       "time": "12:50 PM",
