@@ -56,14 +56,6 @@
       "price": "295.00",
       "status": "1"
     },
-    "AMBH|120418|20261015|LOUNGERS": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "07:00 PM",
-      "date": "20261015",
-      "cat": "LOUNGERS",
-      "price": "295.00",
-      "status": "1"
-    },
     "AMBH|120359|20261015|GOLD": {
       "venue": "AMB Cinemas: Gachibowli",
       "time": "07:20 PM",
@@ -247,6 +239,22 @@
       "cat": "GOLD",
       "price": "295.00",
       "status": "1"
+    },
+    "AMBH|120395|20261016|GOLD": {
+      "venue": "AMB Cinemas: Gachibowli",
+      "time": "12:25 PM",
+      "date": "20261016",
+      "cat": "GOLD",
+      "price": "295.00",
+      "status": "3"
+    },
+    "AMBH|120395|20261016|LOUNGERS": {
+      "venue": "AMB Cinemas: Gachibowli",
+      "time": "12:25 PM",
+      "date": "20261016",
+      "cat": "LOUNGERS",
+      "price": "295.00",
+      "status": "3"
     },
     "AMBH|120192|20261016|GOLD": {
       "venue": "AMB Cinemas: Gachibowli",
