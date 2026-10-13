@@ -1,13 +1,5 @@
 {
   "shows": {
-    "AMBH|120192|20261016|LOUNGERS": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "03:55 PM",
-      "date": "20261016",
-      "cat": "LOUNGERS",
-      "price": "295.00",
-      "status": "3"
-    },
     "AMBH|120384|20261015|GOLD": {
       "venue": "AMB Cinemas: Gachibowli",
       "time": "12:40 PM",
@@ -47,6 +39,14 @@
       "cat": "GOLD",
       "price": "295.00",
       "status": "1"
+    },
+    "AMBH|120183|20261015|LOUNGERS": {
+      "venue": "AMB Cinemas: Gachibowli",
+      "time": "03:45 PM",
+      "date": "20261015",
+      "cat": "LOUNGERS",
+      "price": "295.00",
+      "status": "3"
     },
     "AMBH|120418|20261015|GOLD": {
       "venue": "AMB Cinemas: Gachibowli",
@@ -216,6 +216,14 @@
       "price": "295.00",
       "status": "2"
     },
+    "PRHN|257423|20261015|EXECUTIVE": {
+      "venue": "Prasads Multiplex: Hyderabad",
+      "time": "11:25 PM",
+      "date": "20261015",
+      "cat": "EXECUTIVE",
+      "price": "295.00",
+      "status": "2"
+    },
     "PRHN|257417|20261015|GOLD": {
       "venue": "Prasads Multiplex: Hyderabad",
       "time": "11:40 PM",
@@ -223,6 +231,38 @@
       "cat": "GOLD",
       "price": "295.00",
       "status": "2"
+    },
+    "ALUC|5974|20261015|GOLD": {
+      "venue": "ALLU Cinemas: Kokapet",
+      "time": "09:20 AM",
+      "date": "20261015",
+      "cat": "GOLD",
+      "price": "295.00",
+      "status": "2"
+    },
+    "ALUC|5941|20261015|GOLD": {
+      "venue": "ALLU Cinemas: Kokapet",
+      "time": "10:00 PM",
+      "date": "20261015",
+      "cat": "GOLD",
+      "price": "295.00",
+      "status": "1"
+    },
+    "AMBH|120192|20261016|GOLD": {
+      "venue": "AMB Cinemas: Gachibowli",
+      "time": "03:55 PM",
+      "date": "20261016",
+      "cat": "GOLD",
+      "price": "295.00",
+      "status": "3"
+    },
+    "AMBH|120192|20261016|LOUNGERS": {
+      "venue": "AMB Cinemas: Gachibowli",
+      "time": "03:55 PM",
+      "date": "20261016",
+      "cat": "LOUNGERS",
+      "price": "295.00",
+      "status": "3"
     }
   },
   "dates": {
