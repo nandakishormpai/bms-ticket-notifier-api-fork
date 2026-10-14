@@ -272,10 +272,58 @@
       "price": "295.00",
       "status": "1"
     },
-    "PRHN|257521|20261018|GOLD": {
+    "AMBH|120479|20261016|GOLD": {
+      "venue": "AMB Cinemas: Gachibowli",
+      "time": "09:05 AM",
+      "date": "20261016",
+      "cat": "GOLD",
+      "price": "295.00",
+      "status": "3"
+    },
+    "AMBH|120479|20261016|LOUNGERS": {
+      "venue": "AMB Cinemas: Gachibowli",
+      "time": "09:05 AM",
+      "date": "20261016",
+      "cat": "LOUNGERS",
+      "price": "295.00",
+      "status": "3"
+    },
+    "AMBH|120395|20261016|GOLD": {
+      "venue": "AMB Cinemas: Gachibowli",
+      "time": "12:25 PM",
+      "date": "20261016",
+      "cat": "GOLD",
+      "price": "295.00",
+      "status": "3"
+    },
+    "AMBH|120395|20261016|LOUNGERS": {
+      "venue": "AMB Cinemas: Gachibowli",
+      "time": "12:25 PM",
+      "date": "20261016",
+      "cat": "LOUNGERS",
+      "price": "295.00",
+      "status": "3"
+    },
+    "AMBH|120192|20261016|GOLD": {
+      "venue": "AMB Cinemas: Gachibowli",
+      "time": "03:55 PM",
+      "date": "20261016",
+      "cat": "GOLD",
+      "price": "295.00",
+      "status": "2"
+    },
+    "AMBH|120192|20261016|LOUNGERS": {
+      "venue": "AMB Cinemas: Gachibowli",
+      "time": "03:55 PM",
+      "date": "20261016",
+      "cat": "LOUNGERS",
+      "price": "295.00",
+      "status": "3"
+    },
+    "PRHN|257515|20261017|GOLD": {
       "venue": "Prasads Multiplex: Hyderabad",
       "time": "08:00 AM",
-      "date": "20261018",
+      "date": "20261017",
       "cat": "GOLD",
       "price": "295.00",
       "status": "3"
@@ -285,8 +333,8 @@
     "20261015": "AVAILABLE",
     "20261016": "AVAILABLE",
     "20261017": "AVAILABLE",
-    "20261018": "BOOKABLE",
-    "20261019": "AVAILABLE",
+    "20261018": "AVAILABLE",
+    "20261019": "BOOKABLE",
     "20261020": "AVAILABLE",
     "20261021": "AVAILABLE"
   }
