@@ -40,14 +40,15 @@ def load_tracks():
 RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
 RESEND_TO_EMAIL = os.getenv("RESEND_TO_EMAIL", "")
 RESEND_FROM_EMAIL = os.getenv("RESEND_FROM_EMAIL", "aviiciii@resend.dev")
+PING_URL = os.getenv("PING_URL", "")
 
 # ──────────────────────────────────────────────────────────────────────
 # CONSTANTS & MAPS
 # ──────────────────────────────────────────────────────────────────────
 AVAIL_STATUS_MAP = {
     "1": ("ALMOST FULL", "🟡"),
-    "2": ("FILLING FAST","🟠"),
-    "3": ("AVAILABLE",   "🟢"),
+    "2": ("FILLING FAST", "🟠"),
+    "3": ("AVAILABLE",    "🟢"),
 }
 
 DATE_STYLE_MAP = {
@@ -152,7 +153,7 @@ def fetch_bms(event_code, date_code, region_code, region_slug, lat, lon, geohash
         if resp.status_code == 200:
             return resp.json()
     except requests.RequestException as e:
-        print(f"  Request failed: {e}")
+        print(f"   Request failed: {e}")
     return None
 
 def parse_movie_info(data):
@@ -270,9 +271,20 @@ def load_state(filename):
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
 
-def save_state(filename, state):
+def save_state(filename, new_state):
+    old_state = load_state(filename)
+    
+    # Use newly fetched shows as primary source of truth to automatically prune sold-out/expired shows,
+    # but protect against temporary API glitches by retaining old shows if the new fetch returns 0 shows.
+    merged_shows = new_state.get("shows", {})
+    if not merged_shows and old_state.get("shows"):
+        merged_shows = old_state.get("shows", {})
+
+    merged_dates = old_state.get("dates", {})
+    merged_dates.update(new_state.get("dates", {}))
+
     with open(filename, "w") as f:
-        json.dump(state, f, indent=2)
+        json.dump({"shows": merged_shows, "dates": merged_dates}, f, indent=2)
 
 def build_state(shows, dates):
     show_state = {}
@@ -312,11 +324,9 @@ def detect_changes(old_state, new_state):
 # HTML TABLE GENERATOR
 # ──────────────────────────────────────────────────────────────────────
 def generate_summary_table(shows):
-    # Group shows by (Theatre, Date, Format)
     grouped = {}
     for s in shows:
         attr = (s.screen_attr or "Standard").strip()
-        # Ignore Gold / Lounge formats
         if re.search(r'gold|lounge|lounger', attr, re.IGNORECASE):
             continue
 
@@ -372,10 +382,9 @@ def send_email(subject, changes, movie_name, shows):
     frm = RESEND_FROM_EMAIL.strip() or "onboarding@resend.dev"
 
     if not api_key or not to:
-        print("  ⚠️ Skipping email — RESEND_API_KEY or RESEND_TO_EMAIL not set.")
+        print("   ⚠️ Skipping email — RESEND_API_KEY or RESEND_TO_EMAIL not set.")
         return
 
-    # Define IST timezone (+5:30)
     IST = timezone(timedelta(hours=5, minutes=30))
     now_str = datetime.now(IST).strftime("%d %b %Y, %I:%M %p")
     rows = "".join(f'<li style="padding:4px 0;font-size:14px;">{escape(c)}</li>' for c in changes)
@@ -385,7 +394,7 @@ def send_email(subject, changes, movie_name, shows):
 <html>
 <body style="font-family:Arial,sans-serif;font-size:14px;color:#333;line-height:1.4;">
     <h2 style="margin:0 0 4px 0;font-size:18px;">BMS Alert: {escape(movie_name)}</h2>
-    <p style="margin:0 0 16px 0;font-size:12px;color:#666;">{escape(now_str)}</p>
+    <p style="margin:0 0 16px 0;font-size:12px;color:#666;">{escape(now_str)} IST</p>
     
     <h3 style="font-size:15px;margin-bottom:8px;">Updates / Discoveries</h3>
     <ul style="padding-left:20px;line-height:1.5;">{rows}</ul>
@@ -406,18 +415,19 @@ def send_email(subject, changes, movie_name, shows):
             timeout=15,
         )
         if resp.status_code in (200, 201):
-            print(f"  ✅ Email sent to {to}")
+            print(f"   ✅ Email sent to {to}")
         else:
-            print(f"  ❌ Resend error {resp.status_code}: {resp.text}")
+            print(f"   ❌ Resend error {resp.status_code}: {resp.text}")
     except requests.RequestException as e:
-        print(f"  ❌ Email failed: {e}")
+        print(f"   ❌ Email failed: {e}")
 
 # ──────────────────────────────────────────────────────────────────────
 # MAIN EXECUTION LOOP
 # ──────────────────────────────────────────────────────────────────────
 def main():
     tracks = load_tracks()
-    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Running checks for {len(tracks)} movie(s)...")
+    IST = timezone(timedelta(hours=5, minutes=30))
+    print(f"[{datetime.now(IST).strftime('%Y-%m-%d %H:%M:%S IST')}] Running checks for {len(tracks)} movie(s)...")
 
     for track in tracks:
         url = track.get("url", "")
@@ -426,7 +436,7 @@ def main():
         movie_config_name = track.get("movie_name", "Movie")
 
         if not event_code or not region_slug:
-            print(f"  ❌ Invalid URL for track: {movie_config_name}")
+            print(f"   ❌ Invalid URL for track: {movie_config_name}")
             continue
 
         region_code, region_slug_r, lat, lon, geohash = resolve_region(region_slug)
@@ -449,11 +459,11 @@ def main():
             all_shows.extend(parse_shows(data))
 
         if not all_shows:
-            print(f"  ⚠️ No active showtimes found for {movie_info['name']}")
+            print(f"   ⚠️ No active showtimes found for {movie_info['name']}")
             continue
 
         filtered = filter_shows(all_shows, track, movie_info["language"])
-        print(f"  🎬 {movie_info['name']} ({movie_info['language']}) — {len(filtered)} available show(s) matched filters.")
+        print(f"   🎬 {movie_info['name']} ({movie_info['language']}) — {len(filtered)} available show(s) matched filters.")
 
         state_file = get_state_filename(movie_config_name, event_code)
         new_state = build_state(filtered, all_dates)
@@ -472,10 +482,18 @@ def main():
         save_state(state_file, new_state)
 
         if changes:
-            print(f"  ⚡ {len(changes)} update(s) detected! Sending email...")
+            print(f"   ⚡ {len(changes)} update(s) detected! Sending email...")
             send_email(f"BMS Alert: {movie_info['name']} - {len(changes)} update(s)", changes, movie_info["name"], filtered)
         else:
-            print("  ✅ No new available showtimes since last check.")
+            print("   ✅ No new available showtimes since last check.")
+
+    # Heartbeat Ping
+    if PING_URL.strip():
+        try:
+            requests.get(PING_URL.strip(), timeout=10)
+            print("   📡 Heartbeat ping sent successfully.")
+        except requests.RequestException as e:
+            print(f"   ⚠️ Heartbeat ping failed: {e}")
 
     print("\nAll checks complete.")
 
