@@ -274,11 +274,11 @@ def load_state(filename):
 def save_state(filename, new_state):
     old_state = load_state(filename)
     
-    # Use newly fetched shows as primary source of truth to automatically prune sold-out/expired shows,
-    # but protect against temporary API glitches by retaining old shows if the new fetch returns 0 shows.
-    merged_shows = new_state.get("shows", {})
-    if not merged_shows and old_state.get("shows"):
-        merged_shows = old_state.get("shows", {})
+    # Merge existing shows and newly fetched shows safely across all dates
+    merged_shows = old_state.get("shows", {})
+    new_shows = new_state.get("shows", {})
+    if new_shows:
+        merged_shows.update(new_shows)
 
     merged_dates = old_state.get("dates", {})
     merged_dates.update(new_state.get("dates", {}))
@@ -446,6 +446,7 @@ def main():
         all_shows, all_dates = [], []
         movie_info = {"name": movie_config_name, "language": ""}
 
+        # 1. Aggregate shows across ALL dates first
         for dc in date_list:
             data = fetch_bms(event_code, dc, region_code, region_slug_r, lat, lon, geohash)
             if not data:
@@ -469,7 +470,7 @@ def main():
         new_state = build_state(filtered, all_dates)
         old_state = load_state(state_file)
 
-        # First run: treat all matching active shows as initial discoveries
+        # 2. Compare against state
         if not old_state:
             changes = []
             for s in filtered:
@@ -479,6 +480,7 @@ def main():
         else:
             changes = detect_changes(old_state, new_state)
 
+        # 3. Save merged state once per movie
         save_state(state_file, new_state)
 
         if changes:
