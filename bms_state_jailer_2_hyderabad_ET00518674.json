@@ -1,5 +1,13 @@
 {
   "shows": {
+    "AMBH|120378|20261015|GOLD": {
+      "venue": "AMB Cinemas: Gachibowli",
+      "time": "09:15 AM",
+      "date": "20261015",
+      "cat": "GOLD",
+      "price": "295.00",
+      "status": "1"
+    },
     "AMBH|120150|20261015|GOLD": {
       "venue": "AMB Cinemas: Gachibowli",
       "time": "09:20 AM",
