@@ -102,7 +102,7 @@
       "date": "20261015",
       "cat": "LOUNGERS",
       "price": "295.00",
-      "status": "2"
+      "status": "1"
     },
     "AMBH|120360|20261015|GOLD": {
       "venue": "AMB Cinemas: Gachibowli",
@@ -293,14 +293,6 @@
       "time": "03:55 PM",
       "date": "20261016",
       "cat": "LOUNGERS",
-      "price": "295.00",
-      "status": "3"
-    },
-    "PRHN|257515|20261017|GOLD": {
-      "venue": "Prasads Multiplex: Hyderabad",
-      "time": "08:00 AM",
-      "date": "20261017",
-      "cat": "GOLD",
       "price": "295.00",
       "status": "3"
     },
