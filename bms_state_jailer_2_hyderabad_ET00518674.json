@@ -8,22 +8,6 @@
       "price": "295.00",
       "status": "1"
     },
-    "AMBH|120150|20261015|PLATINUM": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "09:20 AM",
-      "date": "20261015",
-      "cat": "PLATINUM",
-      "price": "354.00",
-      "status": "1"
-    },
-    "AMBH|120150|20261015|GOLD": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "09:20 AM",
-      "date": "20261015",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "1"
-    },
     "AMBH|120386|20261015|SEMI RECLINER": {
       "venue": "AMB Cinemas: Gachibowli",
       "time": "09:40 AM",
@@ -400,102 +384,6 @@
       "price": "295.00",
       "status": "2"
     },
-    "AMBH|120461|20261017|GOLD": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "09:15 AM",
-      "date": "20261017",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "3"
-    },
-    "AMBH|120461|20261017|LOUNGERS": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "09:15 AM",
-      "date": "20261017",
-      "cat": "LOUNGERS",
-      "price": "295.00",
-      "status": "3"
-    },
-    "AMBH|120436|20261017|GOLD": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "03:45 PM",
-      "date": "20261017",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "2"
-    },
-    "AMBH|120436|20261017|LOUNGERS": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "03:45 PM",
-      "date": "20261017",
-      "cat": "LOUNGERS",
-      "price": "295.00",
-      "status": "3"
-    },
-    "AMBH|120443|20261017|GOLD": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "10:55 PM",
-      "date": "20261017",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "2"
-    },
-    "AMBH|120443|20261017|LOUNGERS": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "10:55 PM",
-      "date": "20261017",
-      "cat": "LOUNGERS",
-      "price": "295.00",
-      "status": "3"
-    },
-    "PRHN|257515|20261017|GOLD": {
-      "venue": "Prasads Multiplex: Hyderabad",
-      "time": "08:00 AM",
-      "date": "20261017",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "3"
-    },
-    "PRHN|257516|20261017|GOLD": {
-      "venue": "Prasads Multiplex: Hyderabad",
-      "time": "11:05 AM",
-      "date": "20261017",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "3"
-    },
-    "PRHN|257517|20261017|GOLD": {
-      "venue": "Prasads Multiplex: Hyderabad",
-      "time": "02:10 PM",
-      "date": "20261017",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "3"
-    },
-    "PRHN|257650|20261017|EXECUTIVE": {
-      "venue": "Prasads Multiplex: Hyderabad",
-      "time": "05:30 PM",
-      "date": "20261017",
-      "cat": "EXECUTIVE",
-      "price": "295.00",
-      "status": "3"
-    },
-    "PRHN|257519|20261017|GOLD": {
-      "venue": "Prasads Multiplex: Hyderabad",
-      "time": "08:40 PM",
-      "date": "20261017",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "3"
-    },
-    "PRHN|257520|20261017|GOLD": {
-      "venue": "Prasads Multiplex: Hyderabad",
-      "time": "11:50 PM",
-      "date": "20261017",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "3"
-    },
     "PRHN|257521|20261018|GOLD": {
       "venue": "Prasads Multiplex: Hyderabad",
       "time": "08:00 AM",
@@ -533,8 +421,8 @@
     "20261015": "AVAILABLE",
     "20261016": "AVAILABLE",
     "20261017": "AVAILABLE",
-    "20261018": "BOOKABLE",
-    "20261019": "AVAILABLE",
+    "20261018": "AVAILABLE",
+    "20261019": "BOOKABLE",
     "20261020": "AVAILABLE",
     "20261021": "AVAILABLE"
   }
