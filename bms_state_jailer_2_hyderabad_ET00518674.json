@@ -1,124 +1,172 @@
 {
   "shows": {
-    "AMBH|120479|20261016|GOLD": {
+    "AMBH|120384|20261015|GOLD": {
       "venue": "AMB Cinemas: Gachibowli",
-      "time": "09:05 AM",
-      "date": "20261016",
+      "time": "12:40 PM",
+      "date": "20261015",
       "cat": "GOLD",
       "price": "295.00",
-      "status": "3"
+      "status": "1"
     },
-    "AMBH|120479|20261016|LOUNGERS": {
+    "AMBH|120384|20261015|LOUNGERS": {
       "venue": "AMB Cinemas: Gachibowli",
-      "time": "09:05 AM",
-      "date": "20261016",
+      "time": "12:40 PM",
+      "date": "20261015",
       "cat": "LOUNGERS",
       "price": "295.00",
       "status": "3"
     },
-    "AMBH|120395|20261016|GOLD": {
+    "AMBH|120361|20261015|PLATINUM": {
       "venue": "AMB Cinemas: Gachibowli",
-      "time": "12:25 PM",
-      "date": "20261016",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "3"
+      "time": "12:50 PM",
+      "date": "20261015",
+      "cat": "PLATINUM",
+      "price": "354.00",
+      "status": "1"
     },
-    "AMBH|120395|20261016|LOUNGERS": {
+    "AMBH|120361|20261015|GOLD": {
       "venue": "AMB Cinemas: Gachibowli",
-      "time": "12:25 PM",
-      "date": "20261016",
-      "cat": "LOUNGERS",
-      "price": "295.00",
-      "status": "3"
-    },
-    "AMBH|120192|20261016|GOLD": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "03:55 PM",
-      "date": "20261016",
+      "time": "12:50 PM",
+      "date": "20261015",
       "cat": "GOLD",
       "price": "295.00",
       "status": "2"
     },
-    "AMBH|120192|20261016|LOUNGERS": {
+    "AMBH|120361|20261015|LOUNGERS": {
       "venue": "AMB Cinemas: Gachibowli",
-      "time": "03:55 PM",
-      "date": "20261016",
+      "time": "12:50 PM",
+      "date": "20261015",
       "cat": "LOUNGERS",
       "price": "295.00",
       "status": "3"
     },
-    "AMBH|120154|20261016|GOLD": {
+    "AMBH|120183|20261015|GOLD": {
       "venue": "AMB Cinemas: Gachibowli",
-      "time": "11:05 PM",
-      "date": "20261016",
+      "time": "03:45 PM",
+      "date": "20261015",
       "cat": "GOLD",
       "price": "295.00",
-      "status": "3"
+      "status": "1"
     },
-    "AMBH|120154|20261016|LOUNGERS": {
+    "AMBH|120183|20261015|LOUNGERS": {
       "venue": "AMB Cinemas: Gachibowli",
-      "time": "11:05 PM",
-      "date": "20261016",
+      "time": "03:45 PM",
+      "date": "20261015",
       "cat": "LOUNGERS",
       "price": "295.00",
       "status": "3"
     },
-    "PRHN|257694|20261016|EXECUTIVE": {
-      "venue": "Prasads Multiplex: Hyderabad",
-      "time": "08:25 AM",
-      "date": "20261016",
-      "cat": "EXECUTIVE",
-      "price": "295.00",
-      "status": "3"
-    },
-    "PRHN|257576|20261016|EXECUTIVE": {
-      "venue": "Prasads Multiplex: Hyderabad",
-      "time": "11:20 AM",
-      "date": "20261016",
-      "cat": "EXECUTIVE",
-      "price": "295.00",
-      "status": "3"
-    },
-    "PRHN|257596|20261016|GOLD": {
-      "venue": "Prasads Multiplex: Hyderabad",
-      "time": "02:40 PM",
-      "date": "20261016",
+    "AMBH|120483|20261015|GOLD": {
+      "venue": "AMB Cinemas: Gachibowli",
+      "time": "04:10 PM",
+      "date": "20261015",
       "cat": "GOLD",
       "price": "295.00",
       "status": "3"
     },
-    "PRHN|257566|20261016|EXECUTIVE": {
-      "venue": "Prasads Multiplex: Hyderabad",
-      "time": "05:35 PM",
-      "date": "20261016",
-      "cat": "EXECUTIVE",
+    "AMBH|120483|20261015|LOUNGERS": {
+      "venue": "AMB Cinemas: Gachibowli",
+      "time": "04:10 PM",
+      "date": "20261015",
+      "cat": "LOUNGERS",
       "price": "295.00",
       "status": "3"
     },
-    "PRHN|257597|20261016|GOLD": {
+    "AMBH|120385|20261015|LOUNGERS": {
+      "venue": "AMB Cinemas: Gachibowli",
+      "time": "10:20 PM",
+      "date": "20261015",
+      "cat": "LOUNGERS",
+      "price": "295.00",
+      "status": "1"
+    },
+    "AMBH|120360|20261015|LOUNGERS": {
+      "venue": "AMB Cinemas: Gachibowli",
+      "time": "10:40 PM",
+      "date": "20261015",
+      "cat": "LOUNGERS",
+      "price": "295.00",
+      "status": "1"
+    },
+    "PRHN|257414|20261015|GOLD": {
       "venue": "Prasads Multiplex: Hyderabad",
-      "time": "08:05 PM",
-      "date": "20261016",
+      "time": "02:10 PM",
+      "date": "20261015",
       "cat": "GOLD",
       "price": "295.00",
-      "status": "3"
+      "status": "2"
     },
-    "PRHN|257580|20261016|EXECUTIVE": {
+    "PRHN|257420|20261015|EXECUTIVE": {
       "venue": "Prasads Multiplex: Hyderabad",
-      "time": "11:00 PM",
-      "date": "20261016",
+      "time": "02:10 PM",
+      "date": "20261015",
+      "cat": "EXECUTIVE",
+      "price": "295.00",
+      "status": "2"
+    },
+    "PRHN|257557|20261015|EXECUTIVE": {
+      "venue": "Prasads Multiplex: Hyderabad",
+      "time": "05:15 PM",
+      "date": "20261015",
+      "cat": "EXECUTIVE",
+      "price": "295.00",
+      "status": "2"
+    },
+    "PRHN|257614|20261015|EXECUTIVE": {
+      "venue": "Prasads Multiplex: Hyderabad",
+      "time": "05:15 PM",
+      "date": "20261015",
       "cat": "EXECUTIVE",
       "price": "295.00",
       "status": "3"
     },
-    "ALUC|6072|20261016|GOLD": {
+    "PRHN|257422|20261015|EXECUTIVE": {
+      "venue": "Prasads Multiplex: Hyderabad",
+      "time": "08:20 PM",
+      "date": "20261015",
+      "cat": "EXECUTIVE",
+      "price": "295.00",
+      "status": "1"
+    },
+    "PRHN|257416|20261015|GOLD": {
+      "venue": "Prasads Multiplex: Hyderabad",
+      "time": "08:30 PM",
+      "date": "20261015",
+      "cat": "GOLD",
+      "price": "295.00",
+      "status": "1"
+    },
+    "PRHN|257423|20261015|EXECUTIVE": {
+      "venue": "Prasads Multiplex: Hyderabad",
+      "time": "11:25 PM",
+      "date": "20261015",
+      "cat": "EXECUTIVE",
+      "price": "295.00",
+      "status": "2"
+    },
+    "PRHN|257417|20261015|GOLD": {
+      "venue": "Prasads Multiplex: Hyderabad",
+      "time": "11:40 PM",
+      "date": "20261015",
+      "cat": "GOLD",
+      "price": "295.00",
+      "status": "2"
+    },
+    "ALUC|6015|20261015|GOLD": {
       "venue": "ALLU Cinemas: Kokapet",
-      "time": "10:45 PM",
-      "date": "20261016",
+      "time": "04:35 PM",
+      "date": "20261015",
       "cat": "GOLD",
       "price": "295.00",
       "status": "2"
+    },
+    "ALUC|5941|20261015|GOLD": {
+      "venue": "ALLU Cinemas: Kokapet",
+      "time": "10:00 PM",
+      "date": "20261015",
+      "cat": "GOLD",
+      "price": "295.00",
+      "status": "1"
     },
     "AMBH|120461|20261017|GOLD": {
       "venue": "AMB Cinemas: Gachibowli",
@@ -142,7 +190,7 @@
       "date": "20261017",
       "cat": "GOLD",
       "price": "295.00",
-      "status": "2"
+      "status": "1"
     },
     "AMBH|120436|20261017|LOUNGERS": {
       "venue": "AMB Cinemas: Gachibowli",
