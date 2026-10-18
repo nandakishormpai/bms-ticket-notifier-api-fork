@@ -1,35 +1,11 @@
 {
   "shows": {
-    "AMBH|120504|20261018|GOLD": {
+    "AMBH|120586|20261019|PLATINUM": {
       "venue": "AMB Cinemas: Gachibowli",
-      "time": "11:05 PM",
-      "date": "20261018",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "1"
-    },
-    "AMBH|120504|20261018|LOUNGERS": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "11:05 PM",
-      "date": "20261018",
-      "cat": "LOUNGERS",
-      "price": "295.00",
-      "status": "2"
-    },
-    "PRHN|257824|20261018|EXECUTIVE": {
-      "venue": "Prasads Multiplex: Hyderabad",
-      "time": "11:15 PM",
-      "date": "20261018",
-      "cat": "EXECUTIVE",
-      "price": "295.00",
-      "status": "3"
-    },
-    "PRHN|257675|20261018|GOLD": {
-      "venue": "Prasads Multiplex: Hyderabad",
-      "time": "11:55 PM",
-      "date": "20261018",
-      "cat": "GOLD",
-      "price": "295.00",
+      "time": "09:10 AM",
+      "date": "20261019",
+      "cat": "PLATINUM",
+      "price": "354.00",
       "status": "2"
     },
     "AMBH|120586|20261019|GOLD": {
@@ -54,7 +30,7 @@
       "date": "20261019",
       "cat": "GOLD",
       "price": "295.00",
-      "status": "3"
+      "status": "2"
     },
     "AMBH|120550|20261019|LOUNGERS": {
       "venue": "AMB Cinemas: Gachibowli",
@@ -70,7 +46,7 @@
       "date": "20261019",
       "cat": "GOLD",
       "price": "295.00",
-      "status": "3"
+      "status": "2"
     },
     "AMBH|120547|20261019|LOUNGERS": {
       "venue": "AMB Cinemas: Gachibowli",
@@ -86,7 +62,7 @@
       "date": "20261019",
       "cat": "GOLD",
       "price": "295.00",
-      "status": "3"
+      "status": "2"
     },
     "AMBH|120554|20261019|LOUNGERS": {
       "venue": "AMB Cinemas: Gachibowli",
@@ -162,12 +138,12 @@
     }
   },
   "dates": {
-    "20261018": "AVAILABLE",
     "20261019": "BOOKABLE",
     "20261020": "AVAILABLE",
     "20261021": "AVAILABLE",
     "20261022": "AVAILABLE",
     "20261023": "NOT_OPEN",
-    "20261024": "NOT_OPEN"
+    "20261024": "NOT_OPEN",
+    "20261025": "NOT_OPEN"
   }
 }
