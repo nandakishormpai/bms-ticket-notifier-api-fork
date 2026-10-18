@@ -1,13 +1,5 @@
 {
   "shows": {
-    "AMBH|120585|20261018|GOLD": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "04:00 PM",
-      "date": "20261018",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "1"
-    },
     "AMBH|120504|20261018|GOLD": {
       "venue": "AMB Cinemas: Gachibowli",
       "time": "11:05 PM",
@@ -24,21 +16,21 @@
       "price": "295.00",
       "status": "3"
     },
-    "PRHN|257680|20261018|EXECUTIVE": {
-      "venue": "Prasads Multiplex: Hyderabad",
-      "time": "05:30 PM",
-      "date": "20261018",
-      "cat": "EXECUTIVE",
-      "price": "295.00",
-      "status": "1"
-    },
     "PRHN|257674|20261018|GOLD": {
       "venue": "Prasads Multiplex: Hyderabad",
       "time": "08:45 PM",
       "date": "20261018",
       "cat": "GOLD",
       "price": "295.00",
-      "status": "2"
+      "status": "1"
+    },
+    "PRHN|257824|20261018|EXECUTIVE": {
+      "venue": "Prasads Multiplex: Hyderabad",
+      "time": "11:15 PM",
+      "date": "20261018",
+      "cat": "EXECUTIVE",
+      "price": "295.00",
+      "status": "3"
     },
     "PRHN|257675|20261018|GOLD": {
       "venue": "Prasads Multiplex: Hyderabad",
@@ -46,7 +38,7 @@
       "date": "20261018",
       "cat": "GOLD",
       "price": "295.00",
-      "status": "3"
+      "status": "2"
     },
     "ALUC|6215|20261018|GOLD": {
       "venue": "ALLU Cinemas: Kokapet",
