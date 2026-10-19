@@ -1,74 +1,18 @@
 {
   "shows": {
-    "AMBH|120550|20261019|PLATINUM": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "12:45 PM",
-      "date": "20261019",
-      "cat": "PLATINUM",
-      "price": "354.00",
-      "status": "1"
-    },
-    "AMBH|120550|20261019|GOLD": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "12:45 PM",
-      "date": "20261019",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "2"
-    },
-    "AMBH|120550|20261019|LOUNGERS": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "12:45 PM",
-      "date": "20261019",
-      "cat": "LOUNGERS",
-      "price": "295.00",
-      "status": "3"
-    },
-    "AMBH|120547|20261019|GOLD": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "04:00 PM",
-      "date": "20261019",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "2"
-    },
-    "AMBH|120547|20261019|LOUNGERS": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "04:00 PM",
-      "date": "20261019",
-      "cat": "LOUNGERS",
-      "price": "295.00",
-      "status": "3"
-    },
     "AMBH|120554|20261019|GOLD": {
       "venue": "AMB Cinemas: Gachibowli",
       "time": "10:45 PM",
       "date": "20261019",
       "cat": "GOLD",
       "price": "295.00",
-      "status": "2"
+      "status": "1"
     },
     "AMBH|120554|20261019|LOUNGERS": {
       "venue": "AMB Cinemas: Gachibowli",
       "time": "10:45 PM",
       "date": "20261019",
       "cat": "LOUNGERS",
-      "price": "295.00",
-      "status": "3"
-    },
-    "PRHN|257716|20261019|GOLD": {
-      "venue": "Prasads Multiplex: Hyderabad",
-      "time": "01:25 PM",
-      "date": "20261019",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "3"
-    },
-    "PRHN|257771|20261019|GOLD": {
-      "venue": "Prasads Multiplex: Hyderabad",
-      "time": "04:35 PM",
-      "date": "20261019",
-      "cat": "GOLD",
       "price": "295.00",
       "status": "3"
     },
@@ -94,7 +38,7 @@
       "date": "20261019",
       "cat": "GOLD",
       "price": "295.00",
-      "status": "2"
+      "status": "1"
     }
   },
   "dates": {
@@ -102,8 +46,8 @@
     "20261020": "AVAILABLE",
     "20261021": "AVAILABLE",
     "20261022": "AVAILABLE",
-    "20261023": "NOT_OPEN",
-    "20261024": "NOT_OPEN",
-    "20261025": "NOT_OPEN"
+    "20261024": "AVAILABLE",
+    "20261025": "AVAILABLE",
+    "20261026": "NOT_OPEN"
   }
 }
