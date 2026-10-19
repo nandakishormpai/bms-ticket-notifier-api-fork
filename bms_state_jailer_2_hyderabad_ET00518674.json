@@ -1,53 +1,12 @@
 {
-  "shows": {
-    "AMBH|120554|20261019|GOLD": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "10:45 PM",
-      "date": "20261019",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "1"
-    },
-    "AMBH|120554|20261019|LOUNGERS": {
-      "venue": "AMB Cinemas: Gachibowli",
-      "time": "10:45 PM",
-      "date": "20261019",
-      "cat": "LOUNGERS",
-      "price": "295.00",
-      "status": "3"
-    },
-    "PRHN|257718|20261019|GOLD": {
-      "venue": "Prasads Multiplex: Hyderabad",
-      "time": "07:45 PM",
-      "date": "20261019",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "2"
-    },
-    "PRHN|257719|20261019|GOLD": {
-      "venue": "Prasads Multiplex: Hyderabad",
-      "time": "11:00 PM",
-      "date": "20261019",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "3"
-    },
-    "ALUC|6192|20261019|GOLD": {
-      "venue": "ALLU Cinemas: Kokapet",
-      "time": "07:15 PM",
-      "date": "20261019",
-      "cat": "GOLD",
-      "price": "295.00",
-      "status": "1"
-    }
-  },
+  "shows": {},
   "dates": {
-    "20261019": "BOOKABLE",
-    "20261020": "AVAILABLE",
+    "20261020": "BOOKABLE",
     "20261021": "AVAILABLE",
     "20261022": "AVAILABLE",
     "20261024": "AVAILABLE",
     "20261025": "AVAILABLE",
-    "20261026": "NOT_OPEN"
+    "20261026": "NOT_OPEN",
+    "20261027": "NOT_OPEN"
   }
 }
