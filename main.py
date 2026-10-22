@@ -290,6 +290,22 @@ def build_state(shows, dates):
     date_state = {d.date_code: d.status for d in dates}
     return {"shows": show_state, "dates": date_state}
 
+def merge_state(old_state, fetched_state):
+    """
+    Add new entries and update fetched entries.
+    Retain previously saved entries missing from the current response.
+    """
+    return {
+        "shows": {
+            **old_state.get("shows", {}),
+            **fetched_state.get("shows", {}),
+        },
+        "dates": {
+            **old_state.get("dates", {}),
+            **fetched_state.get("dates", {}),
+        },
+    }
+
 def detect_changes(old_state, new_state):
     changes = []
     old_dates = old_state.get("dates", {})
@@ -456,8 +472,10 @@ def main():
         print(f"  🎬 {movie_info['name']} ({movie_info['language']}) — {len(filtered)} available show(s) matched filters.")
 
         state_file = get_state_filename(movie_config_name, event_code)
-        new_state = build_state(filtered, all_dates)
         old_state = load_state(state_file)
+        
+        fetched_state = build_state(filtered, all_dates)
+        new_state = merge_state(old_state, fetched_state)
 
         # First run: treat all matching active shows as initial discoveries
         if not old_state:
