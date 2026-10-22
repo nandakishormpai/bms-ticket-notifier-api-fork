@@ -46,7 +46,7 @@
       "date": "20261107",
       "cat": "3D GOLD",
       "price": "395.00",
-      "status": "1"
+      "status": "2"
     },
     "ALUC|6331|20261107|3D GOLD.": {
       "venue": "ALLU Cinemas: Kokapet",
@@ -70,7 +70,7 @@
       "date": "20261108",
       "cat": "3D GOLD.",
       "price": "395.00",
-      "status": "2"
+      "status": "3"
     }
   },
   "dates": {
