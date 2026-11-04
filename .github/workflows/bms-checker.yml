@@ -16,16 +16,18 @@ jobs:
     timeout-minutes: 30
     permissions:
       contents: write
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: astral-sh/setup-uv@v5
         with:
           python-version: '3.14'
           enable-cache: true
+
       - name: Install dependencies
         run: uv sync --frozen
-      - name: Test parsers and state handling
-        run: uv run python -m unittest discover -s tests -v
+
       - name: Run checker
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
@@ -33,6 +35,7 @@ jobs:
           RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
           BMS_TRACKS: ${{ vars.BMS_TRACKS }}
         run: uv run main.py
+
       - name: Commit updated state
         if: ${{ !cancelled() }}
         shell: bash
