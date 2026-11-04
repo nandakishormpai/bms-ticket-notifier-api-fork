@@ -11,31 +11,37 @@ from html import escape
 from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass, field
 from urllib.parse import urlparse
+from discovery import discover_events, selector_events, booking_url
+import argparse
+import hashlib
 import requests
 
 # ──────────────────────────────────────────────────────────────────────
 # CONFIGURATION
 # ──────────────────────────────────────────────────────────────────────
-DEFAULT_TRACKS = [
-    {
-        "movie_name": "Jailer 2",
-        "url": "https://in.bookmyshow.com/movies/hyderabad/jailer-2/ET00518674",
-        "dates": "20261015,20261016,20261017,20261018,20261019",
-        "theatre": "ALLU,AMB,PRASADS",
-        "time_period": "",
-        "languages": ["Telugu"],
-    }
-]
-
 def load_tracks():
-    raw = os.getenv("BMS_TRACKS", "")
-    if raw.strip():
-        try:
-            return json.loads(raw)
-        except json.JSONDecodeError as e:
-            print(f"❌ Failed to parse BMS_TRACKS JSON: {e}")
-            sys.exit(1)
-    return DEFAULT_TRACKS
+    raw = os.getenv("BMS_TRACKS", "").strip()
+    if raw:
+        tracks = json.loads(raw)
+    else:
+        with open("bms_tracks.json", encoding="utf-8") as config:
+            tracks = json.load(config)
+    if not isinstance(tracks, list) or not tracks:
+        raise ValueError("BMS_TRACKS must be a nonempty JSON array")
+    for track in tracks:
+        if not track.get("movie_name"):
+            raise ValueError("Every track needs movie_name")
+        city = track.get("city") or parse_bms_url(track.get("url", ""))["region_slug"]
+        if city not in REGION_MAP:
+            raise ValueError(f"Unsupported city {city!r}; supported: {', '.join(REGION_MAP)}")
+        track["city"] = city
+        for dc in track.get("dates", "").split(","):
+            if dc.strip():
+                datetime.strptime(dc.strip(), "%Y%m%d")
+        for period in track.get("time_period", "").split(","):
+            if period.strip() and period.strip().lower() not in TIME_PERIODS:
+                raise ValueError(f"Unknown time period: {period}")
+    return tracks
 
 RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
 RESEND_TO_EMAIL = os.getenv("RESEND_TO_EMAIL", "")
@@ -92,6 +98,10 @@ class ShowInfo:
     time_code: str
     screen_attr: str
     categories: list[CatInfo] = field(default_factory=list)
+    event_code: str = ""
+    language: str = ""
+    booking_url: str = ""
+    movie_format: str = ""
 
 @dataclass
 class DateInfo:
@@ -147,13 +157,12 @@ def fetch_bms(event_code, date_code, region_code, region_slug, lat, lon, geohash
         "xLocationShared": "false",
         "lat": lat, "lon": lon,
     }
-    try:
-        resp = requests.get(API_URL, headers=headers, params=params, timeout=15)
-        if resp.status_code == 200:
-            return resp.json()
-    except requests.RequestException as e:
-        print(f"  Request failed: {e}")
-    return None
+    resp = requests.get(API_URL, headers=headers, params=params, timeout=25)
+    resp.raise_for_status()
+    payload = resp.json()
+    if not isinstance(payload.get("data"), dict) or "showtimeWidgets" not in payload["data"]:
+        raise ValueError("Unrecognized showtimes response; refusing to replace state")
+    return payload
 
 def parse_movie_info(data):
     info = {"name": "Unknown Movie", "language": ""}
@@ -162,7 +171,7 @@ def parse_movie_info(data):
             for item in w.get("data", []):
                 for row in item.get("leftText", {}).get("data", []):
                     for c in row.get("components", []):
-                        if "•" in c.get("text", ""):
+                        if re.search(r"[•·]|\s-\s", c.get("text", "")):
                             info["language"] = c["text"].strip()
     bs = data.get("data", {}).get("bottomSheetData", {})
     for w in bs.get("format-selector", {}).get("widgets", []):
@@ -219,7 +228,7 @@ def parse_shows(data):
                     )
                     for cat in sa.get("categories", []):
                         ca = str(cat.get("availStatus", ""))
-                        if ca != "0":  # Ignore sold-out categories
+                        if ca in AVAIL_STATUS_MAP:  # Only known bookable categories
                             show.categories.append(CatInfo(
                                 name=cat.get("priceDesc", ""),
                                 price=cat.get("curPrice", "0"),
@@ -243,7 +252,7 @@ def filter_shows(shows, track, movie_language):
     for s in shows:
         if kws and not any(k in s.venue_name.lower() for k in kws):
             continue
-        if dates_set and s.date_code and s.date_code not in dates_set:
+        if dates_set and s.date_code not in dates_set:
             continue
         if periods:
             try:
@@ -271,14 +280,16 @@ def load_state(filename):
         return {}
 
 def save_state(filename, state):
-    with open(filename, "w") as f:
+    temporary = filename + ".tmp"
+    with open(temporary, "w", encoding="utf-8") as f:
         json.dump(state, f, indent=2)
+    os.replace(temporary, filename)
 
 def build_state(shows, dates):
     show_state = {}
     for s in shows:
         for c in s.categories:
-            key = f"{s.venue_code}|{s.session_id}|{s.date_code}|{c.name}"
+            key = f"{s.event_code}|{s.venue_code}|{s.session_id}|{s.date_code}|{c.name}"
             show_state[key] = {
                 "venue": s.venue_name,
                 "time": s.time,
@@ -286,25 +297,12 @@ def build_state(shows, dates):
                 "cat": c.name,
                 "price": c.price,
                 "status": c.status,
+                "language": s.language,
+                "format": s.movie_format or s.screen_attr,
+                "url": s.booking_url,
             }
     date_state = {d.date_code: d.status for d in dates}
     return {"shows": show_state, "dates": date_state}
-
-def merge_state(old_state, fetched_state):
-    """
-    Add new entries and update fetched entries.
-    Retain previously saved entries missing from the current response.
-    """
-    return {
-        "shows": {
-            **old_state.get("shows", {}),
-            **fetched_state.get("shows", {}),
-        },
-        "dates": {
-            **old_state.get("dates", {}),
-            **fetched_state.get("dates", {}),
-        },
-    }
 
 def detect_changes(old_state, new_state):
     changes = []
@@ -317,10 +315,10 @@ def detect_changes(old_state, new_state):
     old_shows = old_state.get("shows", {})
     new_shows = new_state.get("shows", {})
 
-    for key in set(new_shows) - set(old_shows):
+    for key in sorted(set(new_shows) - set(old_shows)):
         s = new_shows[key]
         _, ico = AVAIL_STATUS_MAP.get(s["status"], ("AVAILABLE", "🟢"))
-        changes.append(f"{ico} TICKETS AVAILABLE: {s['venue']} {s['time']} [{s['date']}] — {s['cat']} ₹{s['price']}")
+        changes.append(f"{ico} TICKETS AVAILABLE: {s['venue']} {s['time']} [{s['date']}] — {s['cat']} ₹{s['price']} — {s.get('language', '')} {s.get('format', '')} {s.get('url', '')}")
 
     return changes
 
@@ -331,10 +329,7 @@ def generate_summary_table(shows):
     # Group shows by (Theatre, Date, Format)
     grouped = {}
     for s in shows:
-        attr = (s.screen_attr or "Standard").strip()
-        # Ignore Gold / Lounge formats
-        if re.search(r'gold|lounge|lounger', attr, re.IGNORECASE):
-            continue
+        attr = " / ".join(x for x in (s.language, s.movie_format, s.screen_attr or "Standard") if x)
 
         key = (s.venue_name, s.date_code, attr)
         if key not in grouped:
@@ -389,7 +384,7 @@ def send_email(subject, changes, movie_name, shows):
 
     if not api_key or not to:
         print("  ⚠️ Skipping email — RESEND_API_KEY or RESEND_TO_EMAIL not set.")
-        return
+        return False
 
     # Define IST timezone (+5:30)
     IST = timezone(timedelta(hours=5, minutes=30))
@@ -423,79 +418,99 @@ def send_email(subject, changes, movie_name, shows):
         )
         if resp.status_code in (200, 201):
             print(f"  ✅ Email sent to {to}")
+            return True
         else:
             print(f"  ❌ Resend error {resp.status_code}: {resp.text}")
     except requests.RequestException as e:
         print(f"  ❌ Email failed: {e}")
+    return False
 
 # ──────────────────────────────────────────────────────────────────────
 # MAIN EXECUTION LOOP
 # ──────────────────────────────────────────────────────────────────────
 def main():
-    tracks = load_tracks()
-    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Running checks for {len(tracks)} movie(s)...")
-
-    for track in tracks:
-        url = track.get("url", "")
-        parsed = parse_bms_url(url)
-        event_code, region_slug = parsed["event_code"], parsed["region_slug"]
-        movie_config_name = track.get("movie_name", "Movie")
-
-        if not event_code or not region_slug:
-            print(f"  ❌ Invalid URL for track: {movie_config_name}")
-            continue
-
-        region_code, region_slug_r, lat, lon, geohash = resolve_region(region_slug)
-        raw_dates = track.get("dates", "").strip()
-        date_list = [d.strip() for d in raw_dates.split(",") if d.strip()] if raw_dates else [parsed.get("date_code", "")]
-
-        all_shows, all_dates = [], []
-        movie_info = {"name": movie_config_name, "language": ""}
-
-        for dc in date_list:
-            data = fetch_bms(event_code, dc, region_code, region_slug_r, lat, lon, geohash)
-            if not data:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dry-run", action="store_true", help="Discover and fetch; do not email or write state")
+    parser.add_argument("--discover-only", action="store_true", help="Print matching movie IDs only; no email/state")
+    args = parser.parse_args()
+    failures = 0
+    for track in load_tracks():
+        try:
+            city = track["city"]
+            region = resolve_region(city)
+            events = discover_events(track, region[1])
+            print(f"{track['movie_name']} / {city}: discovered {events}")
+            if args.discover_only:
                 continue
-            if not movie_info["language"]:
-                parsed_info = parse_movie_info(data)
-                if parsed_info["name"] != "Unknown Movie":
-                    movie_info["name"] = parsed_info["name"]
-                movie_info["language"] = parsed_info["language"]
-            all_dates.extend(parse_dates(data))
-            all_shows.extend(parse_shows(data))
+            pending = list(events)
+            visited = set()
+            all_shows, all_dates = [], []
+            dates = [d.strip() for d in track.get("dates", "").split(",") if d.strip()] or [""]
+            today = datetime.now(timezone(timedelta(hours=5, minutes=30))).strftime("%Y%m%d")
+            dates = [d for d in dates if not d or d >= today]
+            while pending and dates:
+                event = pending.pop(0)
+                if event in visited:
+                    continue
+                visited.add(event)
+                if len(visited) > 60:
+                    raise ValueError("Unexpectedly many format variants; inspect selector schema")
+                event_dates = list(dates)
+                fetched_dates = set()
+                while event_dates:
+                    dc = event_dates.pop(0)
+                    if dc in fetched_dates:
+                        continue
+                    fetched_dates.add(dc)
+                    data = fetch_bms(event, dc, *region)
+                    for related in selector_events(data):
+                        if related not in visited and related not in pending:
+                            pending.append(related)
+                    if dates == [""]:
+                        for date in parse_dates(data):
+                            if date.status in ("BOOKABLE", "AVAILABLE") and date.date_code >= today and date.date_code not in fetched_dates:
+                                event_dates.append(date.date_code)
+                    info = parse_movie_info(data)
+                    if track.get("languages") and not info["language"]:
+                        raise ValueError(f"Missing language metadata for {event}; cannot safely apply filter")
+                    shows = parse_shows(data)
+                    for show in shows:
+                        # Requested date is authoritative only when API omits it.
+                        selected_date = next((d.date_code for d in parse_dates(data) if d.status == "BOOKABLE"), "")
+                        show.date_code = show.date_code or dc or selected_date
+                        if not show.date_code:
+                            raise ValueError("Show has no date; refusing undated alert")
+                        show.event_code = event
+                        metadata = re.split(r"\s*[•·]\s*|\s+-\s+", info["language"], maxsplit=1)
+                        show.language = metadata[0]
+                        show.movie_format = metadata[1] if len(metadata) > 1 else ""
+                        show.booking_url = booking_url(event, show.date_code)
+                        show.screen_attr = show.screen_attr if isinstance(show.screen_attr, str) else json.dumps(show.screen_attr)
+                    all_shows.extend(filter_shows(shows, track, info["language"]))
+                    all_dates.extend(d for d in parse_dates(data) if not dc or d.date_code == dc)
+            unique = {(s.event_code, s.venue_code, s.session_id, s.date_code): s for s in all_shows}
+            shows = list(unique.values())
+            print(f"  {len(visited)} variants checked; {len(shows)} bookable shows matched")
+            for show in shows:
+                print(f"  {show.date_code} {show.venue_name} {show.time} {show.screen_attr} {show.booking_url}")
+            if args.dry_run or not dates:
+                continue
+            # Config fingerprint keeps filters/cities from sharing state accidentally.
+            identity = json.dumps(track, sort_keys=True, ensure_ascii=True)
+            key = hashlib.sha256(identity.encode()).hexdigest()[:12]
+            filename = get_state_filename(track["movie_name"], key)
+            old = load_state(filename)
+            current = build_state(shows, all_dates)
+            changes = detect_changes(old, current)
+            if changes:
+                if not send_email(f"BMS Alert: {track['movie_name']} - {len(changes)} updates", changes, track["movie_name"], shows):
+                    raise RuntimeError("Notification not delivered; state kept for retry")
+            save_state(filename, current)
+        except (requests.RequestException, ValueError, RuntimeError, OSError, KeyError, TypeError) as exc:
+            failures += 1
+            print(f"ERROR {track['movie_name']}: {exc}", file=sys.stderr)
+    return 1 if failures else 0
 
-        if not all_shows:
-            print(f"  ⚠️ No active showtimes found for {movie_info['name']}")
-            continue
-
-        filtered = filter_shows(all_shows, track, movie_info["language"])
-        print(f"  🎬 {movie_info['name']} ({movie_info['language']}) — {len(filtered)} available show(s) matched filters.")
-
-        state_file = get_state_filename(movie_config_name, event_code)
-        old_state = load_state(state_file)
-        
-        fetched_state = build_state(filtered, all_dates)
-        new_state = merge_state(old_state, fetched_state)
-
-        # First run: treat all matching active shows as initial discoveries
-        if not old_state:
-            changes = []
-            for s in filtered:
-                for c in s.categories:
-                    _, ico = AVAIL_STATUS_MAP.get(c.status, ("AVAILABLE", "🟢"))
-                    changes.append(f"{ico} INITIAL DISCOVERY: {s.venue_name} {s.time} [{s.date_code}] — {c.name} ₹{c.price}")
-        else:
-            changes = detect_changes(old_state, new_state)
-
-        save_state(state_file, new_state)
-
-        if changes:
-            print(f"  ⚡ {len(changes)} update(s) detected! Sending email...")
-            send_email(f"BMS Alert: {movie_info['name']} - {len(changes)} update(s)", changes, movie_info["name"], filtered)
-        else:
-            print("  ✅ No new available showtimes since last check.")
-
-    print("\nAll checks complete.")
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
