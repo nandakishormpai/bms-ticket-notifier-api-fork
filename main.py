@@ -11,7 +11,7 @@ from html import escape
 from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass, field
 from urllib.parse import urlparse
-from discovery import discover_events, selector_events, booking_url
+from discovery import discover_events, selector_events, booking_url, parse_parent_url
 import argparse
 import hashlib
 import requests
@@ -31,7 +31,10 @@ def load_tracks():
     for track in tracks:
         if not track.get("movie_name"):
             raise ValueError("Every track needs movie_name")
-        city = track.get("city") or parse_bms_url(track.get("url", ""))["region_slug"]
+        parent = parse_parent_url(track.get("url", ""))
+        city = parent["region_slug"]
+        if track.get("city") and resolve_region(track["city"])[1] != resolve_region(city)[1]:
+            raise ValueError("city must agree with the city in the movie URL")
         if city not in REGION_MAP:
             raise ValueError(f"Unsupported city {city!r}; supported: {', '.join(REGION_MAP)}")
         track["city"] = city
@@ -139,7 +142,7 @@ def fetch_bms(event_code, date_code, region_code, region_slug, lat, lon, geohash
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
         "Accept": "application/json, text/plain, */*",
         "Accept-Language": "en-US,en;q=0.9",
-        "Referer": f"https://in.bookmyshow.com/movies/{region_slug}/buytickets/{event_code}/",
+        "Referer": booking_url(event_code, date_code or "") or "https://in.bookmyshow.com/",
         "x-app-code": "WEB",
         "x-region-code": region_code,
         "x-region-slug": region_slug,
@@ -160,7 +163,10 @@ def fetch_bms(event_code, date_code, region_code, region_slug, lat, lon, geohash
     resp = requests.get(API_URL, headers=headers, params=params, timeout=25)
     resp.raise_for_status()
     payload = resp.json()
-    if not isinstance(payload.get("data"), dict) or "showtimeWidgets" not in payload["data"]:
+    body = payload.get("data") if isinstance(payload, dict) else None
+    if not isinstance(body, dict) or not (
+        "showtimeWidgets" in body or "format-selector" in body.get("bottomSheetData", {})
+    ):
         raise ValueError("Unrecognized showtimes response; refusing to replace state")
     return payload
 
@@ -431,7 +437,6 @@ def send_email(subject, changes, movie_name, shows):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--dry-run", action="store_true", help="Discover and fetch; do not email or write state")
-    parser.add_argument("--discover-only", action="store_true", help="Print matching movie IDs only; no email/state")
     args = parser.parse_args()
     failures = 0
     for track in load_tracks():
@@ -440,22 +445,27 @@ def main():
             region = resolve_region(city)
             events = discover_events(track, region[1])
             print(f"{track['movie_name']} / {city}: discovered {events}")
-            if args.discover_only:
-                continue
             pending = list(events)
             visited = set()
             all_shows, all_dates = [], []
-            dates = [d.strip() for d in track.get("dates", "").split(",") if d.strip()] or [""]
+            dates = [d.strip() for d in track.get("dates", "").split(",") if d.strip()]
+            if not dates:
+                dates = [parse_parent_url(track["url"])["date_code"]]
             today = datetime.now(timezone(timedelta(hours=5, minutes=30))).strftime("%Y%m%d")
             dates = [d for d in dates if not d or d >= today]
-            while pending and dates:
+            if not dates:
+                print("  All configured dates are in the past; skipping")
+                continue
+            while pending:
                 event = pending.pop(0)
                 if event in visited:
                     continue
                 visited.add(event)
                 if len(visited) > 60:
                     raise ValueError("Unexpectedly many format variants; inspect selector schema")
-                event_dates = list(dates)
+                # Bootstrap without a date so the parent's variants can be
+                # discovered even when it has no shows on the requested dates.
+                event_dates = [""] + [d for d in dates if d]
                 fetched_dates = set()
                 while event_dates:
                     dc = event_dates.pop(0)
@@ -471,9 +481,12 @@ def main():
                             if date.status in ("BOOKABLE", "AVAILABLE") and date.date_code >= today and date.date_code not in fetched_dates:
                                 event_dates.append(date.date_code)
                     info = parse_movie_info(data)
-                    if track.get("languages") and not info["language"]:
+                    if parse_shows(data) and (dc or dates == [""]) and track.get("languages") and not info["language"]:
                         raise ValueError(f"Missing language metadata for {event}; cannot safely apply filter")
                     shows = parse_shows(data)
+                    if not dc and dates != [""]:
+                        # Bootstrap is for discovery, never for out-of-scope alerts.
+                        continue
                     for show in shows:
                         # Requested date is authoritative only when API omits it.
                         selected_date = next((d.date_code for d in parse_dates(data) if d.status == "BOOKABLE"), "")
