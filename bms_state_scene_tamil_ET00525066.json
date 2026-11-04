@@ -7,12 +7,36 @@
       "cat": "EXECUTIVE",
       "price": "295.00",
       "status": "3"
+    },
+    "PRHN|258546|20261106|EXECUTIVE": {
+      "venue": "Prasads Multiplex: Hyderabad",
+      "time": "10:50 AM",
+      "date": "20261106",
+      "cat": "EXECUTIVE",
+      "price": "295.00",
+      "status": "2"
+    },
+    "PRHN|258555|20261106|EXECUTIVE": {
+      "venue": "Prasads Multiplex: Hyderabad",
+      "time": "05:20 PM",
+      "date": "20261106",
+      "cat": "EXECUTIVE",
+      "price": "295.00",
+      "status": "2"
+    },
+    "PRHN|258584|20261108|EXECUTIVE": {
+      "venue": "Prasads Multiplex: Hyderabad",
+      "time": "08:00 AM",
+      "date": "20261108",
+      "cat": "EXECUTIVE",
+      "price": "295.00",
+      "status": "3"
     }
   },
   "dates": {
     "20261106": "AVAILABLE",
-    "20261107": "BOOKABLE",
-    "20261108": "AVAILABLE",
+    "20261107": "AVAILABLE",
+    "20261108": "BOOKABLE",
     "20261109": "NOT_OPEN",
     "20261110": "NOT_OPEN",
     "20261111": "NOT_OPEN",
