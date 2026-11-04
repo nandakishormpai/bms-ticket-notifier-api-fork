@@ -2,9 +2,13 @@ name: BMS Ticket Checker
 
 on:
   schedule:
-    # Every 5 minutes minutes
+    # UTC: minutes 04, 09, 14, ... 59. Scheduled runs may be delayed by GitHub.
     - cron: '4-59/5 * * * *'
-  workflow_dispatch:  # Manual trigger button
+  workflow_dispatch:  # Manual runs behave exactly like scheduled runs
+
+concurrency:
+  group: bms-ticket-checker-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   check-tickets:
@@ -12,19 +16,16 @@ jobs:
     timeout-minutes: 30
     permissions:
       contents: write
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
         with:
           python-version: '3.14'
-
+          enable-cache: true
       - name: Install dependencies
         run: uv sync --frozen
-
+      - name: Test parsers and state handling
+        run: uv run python -m unittest discover -s tests -v
       - name: Run checker
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
@@ -32,10 +33,19 @@ jobs:
           RESEND_FROM_EMAIL: ${{ secrets.RESEND_FROM_EMAIL }}
           BMS_TRACKS: ${{ vars.BMS_TRACKS }}
         run: uv run main.py
-
       - name: Commit updated state
+        if: ${{ !cancelled() }}
+        shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add bms_state*.json
-          git diff --cached --quiet || (git commit -m "chore: update state files [skip ci]" && git push)
+          shopt -s nullglob
+          files=(bms_state*.json)
+          if (( ${#files[@]} )); then
+            git add -- "${files[@]}"
+            if ! git diff --cached --quiet; then
+              git commit -m "chore: update state files [skip ci]"
+              git pull --rebase
+              git push
+            fi
+          fi
