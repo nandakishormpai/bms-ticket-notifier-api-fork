@@ -54,16 +54,12 @@ class Links(HTMLParser):
 
 
 def title_match(title, track):
-    # Explicit aliases, not fuzzy matches: Dune 3 should not match Dune 2.
+    """Require every query word, in any order; allow additional title words."""
+    actual_words = set(normalize(title).split())
     names = [track["movie_name"], *track.get("search_names", [])]
-    actual = normalize(title)
     for name in names:
-        expected = normalize(name)
-        if actual == expected:
-            return True
-        # BMS sometimes labels an edition as Scene (Tamil) / Scene (EPIQ).
-        stripped = re.sub(r"\([^)]*\)", "", title)
-        if normalize(stripped) == expected:
+        query_words = set(normalize(name).split())
+        if query_words and query_words.issubset(actual_words):
             return True
     return False
 
@@ -151,7 +147,7 @@ def discover_events(track, city):
         found.add(seed[0])
         EVENT_URLS[seed[0]] = track["url"]
     if not found:
-        raise ValueError("Movie not discovered in city catalogues; check exact title/search_names. " + "; ".join(errors))
+        raise ValueError("Movie not discovered in city catalogues; check search words/search_names. " + "; ".join(errors))
     for error in errors:
         print(f"  Discovery warning: {error}")
     return sorted(found)
