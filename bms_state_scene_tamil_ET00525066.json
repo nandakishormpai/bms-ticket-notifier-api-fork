@@ -38,6 +38,14 @@
       "date": "20261107",
       "cat": "EXECUTIVE",
       "price": "295.00",
+      "status": "2"
+    },
+    "PRHN|258634|20261108|EXECUTIVE": {
+      "venue": "Prasads Multiplex: Hyderabad",
+      "time": "05:20 PM",
+      "date": "20261108",
+      "cat": "EXECUTIVE",
+      "price": "295.00",
       "status": "3"
     }
   },
