@@ -46,13 +46,13 @@
       "date": "20261108",
       "cat": "EXECUTIVE",
       "price": "295.00",
-      "status": "3"
+      "status": "2"
     }
   },
   "dates": {
     "20261106": "AVAILABLE",
-    "20261107": "BOOKABLE",
-    "20261108": "AVAILABLE",
+    "20261107": "AVAILABLE",
+    "20261108": "BOOKABLE",
     "20261109": "AVAILABLE",
     "20261110": "NOT_OPEN",
     "20261111": "NOT_OPEN",
