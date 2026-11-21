@@ -23,6 +23,14 @@
       "cat": "EXECUTIVE",
       "price": "295.00",
       "status": "3"
+    },
+    "PRHN|259350|20261219|EXECUTIVE": {
+      "venue": "Prasads Multiplex: Hyderabad",
+      "time": "08:00 AM",
+      "date": "20261219",
+      "cat": "EXECUTIVE",
+      "price": "295.00",
+      "status": "3"
     }
   },
   "dates": {
