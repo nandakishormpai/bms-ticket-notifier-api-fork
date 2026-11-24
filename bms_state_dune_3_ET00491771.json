@@ -143,12 +143,20 @@
       "cat": "LOUNGERS",
       "price": "295.00",
       "status": "3"
+    },
+    "PRHN|259271|20261217|GOLD": {
+      "venue": "Prasads Multiplex: Hyderabad",
+      "time": "08:20 PM",
+      "date": "20261217",
+      "cat": "GOLD",
+      "price": "295.00",
+      "status": "1"
     }
   },
   "dates": {
-    "20261216": "AVAILABLE",
+    "20261216": "BOOKABLE",
     "20261217": "AVAILABLE",
-    "20261218": "BOOKABLE",
+    "20261218": "AVAILABLE",
     "20261219": "AVAILABLE",
     "20261220": "AVAILABLE",
     "20261221": "NOT_OPEN",
