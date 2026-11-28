@@ -191,15 +191,23 @@
       "cat": "GOLD",
       "price": "295.00",
       "status": "3"
+    },
+    "PRHN|259648|20261222|GOLD": {
+      "venue": "Prasads Multiplex: Hyderabad",
+      "time": "11:05 AM",
+      "date": "20261222",
+      "cat": "GOLD",
+      "price": "295.00",
+      "status": "3"
     }
   },
   "dates": {
-    "20261216": "AVAILABLE",
+    "20261216": "BOOKABLE",
     "20261217": "AVAILABLE",
     "20261218": "AVAILABLE",
     "20261219": "AVAILABLE",
     "20261220": "AVAILABLE",
-    "20261221": "BOOKABLE",
+    "20261221": "AVAILABLE",
     "20261222": "AVAILABLE",
     "20261223": "AVAILABLE"
   }
